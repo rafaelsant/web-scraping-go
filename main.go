@@ -12,8 +12,12 @@ func main() {
 
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
-
 	var response []string
+	GetTitles(url, &response, ctx)
+	println(response[0])
+}
+
+func GetTitles(url string, response *[]string, ctx context.Context) {
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Evaluate(`
@@ -23,5 +27,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("error while reading %v", err)
 	}
-	println(response)
 }
