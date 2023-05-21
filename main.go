@@ -13,10 +13,13 @@ func main() {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	var response string
+	var response []string
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
-		chromedp.Text(`.header`, &response))
+		chromedp.Evaluate(`
+		var a = []
+		document.querySelectorAll(".lister-item-header").forEach(i => a.push(i.innerText))
+		a`, &response))
 	if err != nil {
 		log.Fatalf("error while reading %v", err)
 	}
