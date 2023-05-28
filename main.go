@@ -13,17 +13,21 @@ func main() {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 	var response []string
-	GetTitles(url, &response, ctx)
-	println(response[0])
+	var images []string
+	GetInformation(url, &response, &images, ctx)
+	println(images[0])
 }
 
-func GetTitles(url string, response *[]string, ctx context.Context) {
+func GetInformation(url string, response *[]string, images *[]string, ctx context.Context) {
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Evaluate(`
 		var a = []
 		document.querySelectorAll(".lister-item-header").forEach(i => a.push(i.innerText))
-		a`, &response))
+		a`, &response), chromedp.Evaluate(`
+		var a = []
+		document.querySelectorAll("div > div > div > div > a > img").forEach(i => a.push(i.src))
+		a`, &images))
 	if err != nil {
 		log.Fatalf("error while reading %v", err)
 	}
