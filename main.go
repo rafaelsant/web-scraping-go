@@ -14,11 +14,12 @@ func main() {
 	defer cancel()
 	var response []string
 	var images []string
-	GetInformation(url, &response, &images, ctx)
-	println(images[0])
+	var description []string
+	GetInformation(url, &response, &images, &description, ctx)
+	println(description[0])
 }
 
-func GetInformation(url string, response *[]string, images *[]string, ctx context.Context) {
+func GetInformation(url string, response *[]string, images *[]string, description *[]string, ctx context.Context) {
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Evaluate(`
@@ -27,7 +28,10 @@ func GetInformation(url string, response *[]string, images *[]string, ctx contex
 		a`, &response), chromedp.Evaluate(`
 		var a = []
 		document.querySelectorAll("div > div > div > div > a > img").forEach(i => a.push(i.src))
-		a`, &images))
+		a`, &images), chromedp.Evaluate(`
+		var a = []
+		document.querySelectorAll(".list-description > p").forEach(i => a.push(i.innerText))
+		a`, &description))
 	if err != nil {
 		log.Fatalf("error while reading %v", err)
 	}
