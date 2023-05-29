@@ -15,11 +15,12 @@ func main() {
 	var response []string
 	var images []string
 	var description []string
-	GetInformation(url, &response, &images, &description, ctx)
-	println(description[0])
+	var metadata []string
+	GetInformation(url, &response, &images, &description, &metadata, ctx)
+	println(metadata[0])
 }
 
-func GetInformation(url string, response *[]string, images *[]string, description *[]string, ctx context.Context) {
+func GetInformation(url string, response *[]string, images *[]string, description *[]string, metadata *[]string, ctx context.Context) {
 	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
 		chromedp.Evaluate(`
@@ -31,7 +32,11 @@ func GetInformation(url string, response *[]string, images *[]string, descriptio
 		a`, &images), chromedp.Evaluate(`
 		var a = []
 		document.querySelectorAll(".list-description > p").forEach(i => a.push(i.innerText))
-		a`, &description))
+		a`, &description),
+		chromedp.Evaluate(`
+		var a = []
+		document.querySelectorAll("div > div > div > .text-muted").forEach(y => {if(y.innerText.startsWith('Director')){a.push(y.innerText)}})
+		a`, &metadata))
 	if err != nil {
 		log.Fatalf("error while reading %v", err)
 	}
